@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth import login, authenticate, get_user_model, logout
+from django.contrib.auth.decorators import login_required
 from .models import Book
 
 def index(request):
@@ -10,6 +12,7 @@ def index(request):
     
     return HttpResponse("Metodo no permitido", status=405)
 
+@login_required
 def create_book(request):
     if request.method == 'GET':
         return render(request, 'create_book.html')
@@ -36,4 +39,48 @@ def create_book(request):
 def delete_book(request, book_id):
     book = Book.objects.get(id=book_id)
     book.delete()
+    return redirect('index')
+
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        
+        if password1 != password2:
+            messages.error(request, 'Las contraseñas no coinciden')
+            return render(request, 'register.html')
+            
+        User = get_user_model()
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'El nombre de usuario ya existe')
+            return render(request, 'register.html')
+            
+        try:
+            user = User.objects.create_user(username=username, password=password1)
+            login(request, user)
+            messages.success(request, 'Registro exitoso')
+            return redirect('index')
+        except Exception as e:
+            messages.error(request, f'Error al crear el usuario: {str(e)}')
+            return render(request, 'register.html')
+            
+    return render(request, 'register.html')
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Inicio de sesión exitoso')
+            return redirect('index')
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos')
+    return render(request, 'login.html')
+
+def logout_view(request):
+    logout(request)
+    messages.success(request, 'Has cerrado sesión exitosamente')
     return redirect('index')

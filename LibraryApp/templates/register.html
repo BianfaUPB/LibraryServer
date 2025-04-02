@@ -1,0 +1,67 @@
+{% extends 'layout.html' %} {% load static %} {% block title %}Registro -
+Biblioteca{% endblock %} {% block content %}
+<h1 class="mb-4">Registro de Usuario</h1>
+
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <div class="card">
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="username" class="form-label">Nombre de Usuario</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              required
+            />
+            <small class="form-text text-muted"
+              >150 caracteres o menos. Solo letras, números y @/./+/-/_</small
+            >
+          </div>
+          <div class="mb-3">
+            <label for="password1" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password1"
+              name="password1"
+              required
+            />
+            <small class="form-text text-muted">
+              <ul>
+                <li>
+                  Tu contraseña no puede ser muy similar a tu nombre de usuario.
+                </li>
+                <li>Tu contraseña debe contener al menos 8 caracteres.</li>
+                <li>Tu contraseña no puede ser una contraseña común.</li>
+                <li>Tu contraseña no puede ser completamente numérica.</li>
+              </ul>
+            </small>
+          </div>
+          <div class="mb-3">
+            <label for="password2" class="form-label"
+              >Confirmar Contraseña</label
+            >
+            <input
+              type="password"
+              class="form-control"
+              id="password2"
+              name="password2"
+              required
+            />
+          </div>
+          <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Registrarse</button>
+            <a href="{% url 'login' %}" class="btn btn-link"
+              >¿Ya tienes cuenta? Inicia sesión</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

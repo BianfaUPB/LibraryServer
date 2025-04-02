@@ -23,4 +23,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('create-book/', views.create_book, name='create_book'),
     path('delete-book/<int:book_id>/', views.delete_book, name='delete_book'),
+    path('register/', views.register, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
