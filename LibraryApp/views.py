@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, get_user_model, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from .models import Book
 
 def index(request):
@@ -36,10 +37,17 @@ def create_book(request):
     
     return HttpResponse("Metodo no permitido",status=405)
 
+@login_required
+@require_http_methods(["DELETE"])
 def delete_book(request, book_id):
-    book = Book.objects.get(id=book_id)
-    book.delete()
-    return redirect('index')
+    try:
+        book = Book.objects.get(id=book_id)
+        book.delete()
+        return JsonResponse({'status': 'success', 'message': 'Libro eliminado exitosamente'})
+    except Book.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'El libro no existe'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'Error al eliminar el libro: {str(e)}'}, status=500)
 
 def register(request):
     if request.method == 'POST':
